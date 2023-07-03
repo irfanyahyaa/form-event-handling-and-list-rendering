@@ -1,41 +1,51 @@
 <script>
+import List from "./List.vue";
+
 export default {
+  components: {
+    List,
+  },
   props: {
     title: {
       type: String,
       required: true,
       default: "Form Penilaian Siswa",
     },
-    lists: [],
   },
-  emits: ['addTask'],
+  emits: ["addTask"],
   data() {
     return {
-      form: {
-        nis: "",
-        nama: "",
-        nilai: "",
-      },
+      lists: [],
+      nisValue: "",
+      namaValue: "",
+      nilaiValue: "",
     };
   },
+  // computed: {
+  //   average() {
+  //     return this.lists.reduce((total, curr) => (total = total + curr.nilai), 0) / lists.length
+  //   }
+  // },
   methods: {
     addTask() {
-      console.log("title: ", this.titleValue);
-      console.log("description: ", this.descriptionValue);
+      console.log("nis: ", this.nisValue);
+      console.log("nama: ", this.namaValue);
+      console.log("nilai: ", this.nilaiValue);
       this.lists.push({
         id: this.lists.length + 1,
-        title: this.titleValue,
-        description: this.descriptionValue,
+        nis: this.nisValue,
+        nama: this.namaValue,
+        nilai: this.nilaiValue,
         isDone: false,
       });
       this.$emit("addTask", this.lists);
     },
-    // deleteTask(task) {
-    //   const index = this.lists.indexOf(task);
-    //   if (index !== -1) {
-    //     this.lists.splice(index, 1);
-    //   }
-    // },
+    deleteTask(list) {
+      const index = this.lists.indexOf(list);
+      if (index !== -1) {
+        this.lists.splice(index, 1);
+      }
+    },
     saveTask() {
       this.addTask();
       this.clearForm();
@@ -44,9 +54,9 @@ export default {
       this.clearForm();
     },
     clearForm() {
-      this.titleValue = "";
-      this.descriptionValue = "";
-      this.isCreating = false;
+      this.nisValue = "";
+      this.namaValue = "";
+      this.nilaiValue = "";
     },
   },
 };
@@ -55,12 +65,12 @@ export default {
 <template>
   <div class="m-5">
     <h1>{{ title }}</h1>
-    <section class="form">
+    <section class="form border-bottom pt-2 pb-4">
       <div class="field mb-2">
         <label class="label">No Induk Siswa</label>
         <div class="control">
           <input
-            v-model="form.nis"
+            v-model="nisValue"
             class="form-control"
             type="number"
             placeholder="Masukkan NIS"
@@ -71,7 +81,7 @@ export default {
         <label class="label">Nama Siswa</label>
         <div class="control">
           <input
-            v-model="form.nama"
+            v-model="namaValue"
             class="form-control"
             type="text"
             placeholder="Masukkan Nama"
@@ -82,7 +92,7 @@ export default {
         <label class="label">Nilai Tugas</label>
         <div class="control">
           <input
-            v-model="form.nilai"
+            v-model="nilaiValue"
             class="form-control"
             type="number"
             min="0"
@@ -98,13 +108,17 @@ export default {
         </button>
       </div>
     </section>
-    <!-- <section class="content">
-      <ul>
-        <li v-for="(item, k) in form">
-          <strong>{{ k }}:</strong> {{ item }}
-        </li>
-      </ul>
-    </section> -->
+    <List :lists="lists" />
+    <div class="average-list mt-3" v-if="lists.length">
+      <p>
+        Rata-rata niai dari <strong>{{ lists.length }}</strong> orang siswa
+        adalah:
+        <strong>{{
+          lists.reduce((total, curr) => (total = total + curr.nilai), 0) /
+          lists.length
+        }}</strong>
+      </p>
+    </div>
   </div>
 </template>
 
